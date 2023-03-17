@@ -92,7 +92,7 @@ def wrap_function(fun: Callable, injector: Injector) -> Callable:
     async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
         return await injector.call_with_injection(callable=fun, args=args, kwargs=kwargs)
 
-    return async_wrapper if iscoroutinefunction(fun) else wrapper()
+    return async_wrapper if iscoroutinefunction(fun) else wrapper
 
 
 def wrap_class_based_view(fun: Callable, injector: Injector) -> Callable:
