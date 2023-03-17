@@ -9,7 +9,7 @@
 #
 # Author: Alec Thomas <alec@swapoff.org>
 import functools
-from inspect import ismethod
+from inspect import ismethod, iscoroutinefunction
 from typing import Any, Callable, cast, Dict, get_type_hints, Iterable, List, TypeVar, Union
 
 import flask
@@ -88,7 +88,11 @@ def wrap_function(fun: Callable, injector: Injector) -> Callable:
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         return injector.call_with_injection(callable=fun, args=args, kwargs=kwargs)
 
-    return wrapper
+    @functools.wraps(fun)
+    async def async_wrapper(*args: Any, **kwargs: Any) -> Any:
+        return await injector.call_with_injection(callable=fun, args=args, kwargs=kwargs)
+
+    return async_wrapper if iscoroutinefunction(fun) else wrapper()
 
 
 def wrap_class_based_view(fun: Callable, injector: Injector) -> Callable:
